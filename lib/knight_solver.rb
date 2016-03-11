@@ -9,24 +9,27 @@ class KnightSolver
   def build_path(map, goal)
     path = Array.new
     current = goal
-    while map.key(current) != current
+    while map[current] != current
       path.unshift(current)
-      current = map.key(current)
+      current = map[current]
     end
-    path.push(current)
     path
   end
 
   def knight_moves(start, end_goal)
     path = Array.new
-    knights = KnightsTravails.new
+    knights = KnightsTravails.new(start, end_goal)
     map = Hash.new
     queue = Array.new
 
-    map[start] = start
-    queue.add(start)
+    start_chess_board = ChessBoard.new
+    start_chess_board.initialize_piece(start[0], start[1], "K")
 
-    found = knights.at_goal?(start)
+    map[start] = start
+    initial_piece = KnightPiece.new(start[0],start[1], start_chess_board)
+    queue.push(initial_piece)
+
+    found = knights.at_goal?(initial_piece)
 
     while !queue.empty? && !found
       current = queue.shift
@@ -43,8 +46,6 @@ class KnightSolver
     end
 
     return path if found
-
     false
-
   end
 end
