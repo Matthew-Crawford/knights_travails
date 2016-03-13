@@ -1,51 +1,61 @@
 require_relative 'knights_travails'
 require_relative 'knight_piece'
 
+# a move solver that provides methods to solve
 class KnightSolver
 
-  attr_accessor :knight_piece
+  attr_accessor :row_size, :col_size
+
+  def initialize(row_size, col_size)
+    @row_size = row_size
+    @col_size = col_size
+  end
+
+  # checks if the end location has been found
+  def at_goal?(curr_config, end_goal)
+    end_goal == [curr_config.row,curr_config.col]
+  end
 
   # build an array representing the moves the knight would need to take
   def build_path(map, goal)
     path = Array.new
     current = goal
-    while map[current] != current
+    until map[current] == current
       path.unshift(current)
       current = map[current]
     end
     path
   end
 
+  # uses a BFS solving algorithm to find the path from one point to another
   def knight_moves(start, end_goal)
-    path = Array.new
-    knights = KnightsTravails.new(start, end_goal)
     map = Hash.new
     queue = Array.new
 
-    start_chess_board = ChessBoard.new
-    start_chess_board.initialize_piece(start[0], start[1], "K")
+    start_chess_board = ChessBoard.new(nil, @row_size, @col_size)
+    start_chess_board.put_piece(start[0], start[1], 'K')
 
     map[start] = start
     initial_piece = KnightPiece.new(start[0],start[1], start_chess_board)
+
+    if start == end_goal
+      return build_path(map, initial_piece)
+    end
+
     queue.push(initial_piece)
 
-    found = knights.at_goal?(initial_piece)
-
-    while !queue.empty? && !found
+    until queue.empty?
       current = queue.shift
       current.get_neighbors.each do |neighbor|
-        if knights.at_goal?(neighbor)
+        if at_goal?(neighbor, end_goal)
           map[neighbor] = current
-          found = true
-          path = build_path(map, neighbor)
+          return build_path(map, neighbor)
         elsif !map.key?(neighbor)
           map[neighbor] = current
           queue.push(neighbor)
         end
       end
     end
-
-    return path if found
     false
   end
 end

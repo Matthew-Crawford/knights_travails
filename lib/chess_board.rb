@@ -22,33 +22,37 @@ class ChessBoard
 
   #checks if the specified cell is within the board
   def validate_cell(row, col)
-    if (row > 7 || row < 0) || (col > 7 || col < 0)
+    if row > row_size - 1 || row < 0 || col > col_size - 1 || col < 0
       return false
     end
     true
   end
 
+  # builds board with empty cells, a "." repesents an empty cell
   def build_board
     @board.each_with_index do |row, row_index|
       row.each_with_index do |col, col_index|
-        @board[row_index][col_index] = '.'
+        @board[row_index][col_index] = '. '
       end
     end
   end
 
+  # builds the finished board with chess pieces
   def build_finished_board(moves, piece)
     moves.each_with_index do |move, index|
-      s = "#{piece}#{index.to_s}"
-      @board[move.row][move.col] = s
+      chess_piece_move_number = "#{piece}#{index.to_s}"
+      @board[move.row][move.col] = chess_piece_move_number
     end
   end
 
-  def initialize_piece(row, col, piece)
+  # places a piece on the board
+  def put_piece(row, col, piece)
     @board[row][col] = piece
   end
 
+  # returns a new board with the configuration of the old board with the new piece placed
   def move(old_board, row, col, piece)
-    new_board = ChessBoard.new(old_board)
+    new_board = ChessBoard.new(old_board, old_board.row_size, old_board.col_size)
     new_board.board[row][col] = piece
     new_board
   end
